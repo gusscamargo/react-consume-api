@@ -1,25 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
+import {useQuery } from "react-query"
 import './App.css';
+import axios from 'axios';
+import { Color } from './types';
+
 
 function App() {
+  const { data, isFetching } = useQuery<Color[]>("colors", async () => {
+    const response = await axios.get("https://reqres.in/api/unknown")
+    
+    return response.data.data
+  })
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <ul>
+      {isFetching && <h1>Carregando...</h1>}
+      {
+          !isFetching
+          && 
+          data?.map((item: Color, index: number) => (
+            <li key={index} style={{ backgroundColor: item.color }}>
+                <h2>{item.id} - {item.name}</h2>
+                <p>{item.year}</p>
+            </li>
+          ))
+      }
+      </ul>
+    </>
   );
 }
 
